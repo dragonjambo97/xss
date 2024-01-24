@@ -8,7 +8,9 @@ import { type Request, type Response, type NextFunction } from 'express'
 import { UserModel } from '../models/user'
 import * as sanitizeHtml from 'sanitize-html'
 
+
 import * as utils from '../lib/utils'
+import { stringAt } from 'pdfkit/js/data'
 const challengeUtils = require('../lib/challengeUtils')
 const challenges = require('../data/datacache').challenges
 
@@ -18,6 +20,9 @@ class ErrorWithParent extends Error {
 
 // vuln-code-snippet start unionSqlInjectionChallenge dbSchemaChallenge
 module.exports = function searchProducts () {
+
+  const sanitizeHtml = require('sanitize-html')
+
   return (req: Request, res: Response, next: NextFunction) => {
     let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
     criteria = (criteria.length <= 200) ? criteria : criteria.substring(0, 200)
