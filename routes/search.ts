@@ -6,8 +6,6 @@
 import models = require('../models/index')
 import { type Request, type Response, type NextFunction } from 'express'
 import { UserModel } from '../models/user'
-import * as sanitizeHtml from 'sanitize-html'
-import { sanitizeInput } from './utils'
 import * as utils from '../lib/utils'
 import { stringAt } from 'pdfkit/js/data'
 import * as sanitizeHtml from 'sanitize-html'
@@ -22,20 +20,15 @@ class ErrorWithParent extends Error {
 // vuln-code-snippet start unionSqlInjectionChallenge dbSchemaChallenge
 module.exports = function searchProducts () {
 
-  const sanitizeHtml = require('sanitize-html')
-  export function searchQuery(query: string) {
-    const sanitizedQuery = sanitizeInput(query);
-    // Logika wyszukiwania z użyciem sanitizedQuery
-  }
-
   return (req: Request, res: Response, next: NextFunction) => {
     let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
     criteria = (criteria.length <= 200) ? criteria : criteria.substring(0, 200)
     
     // Dodanie sanityzacji dla kryteriów wyszukiwania
     criteria = sanitizeHtml(criteria, {
-      allowedTags: [], // żadne tagi HTML nie są dozwolone
+      allowedTags: [] // żadne tagi HTML nie są dozwolone
       allowedAttributes: {} // żadne atrybuty nie są dozwolone
+      disallowedTagsMode: 'discard'
     })
 
     models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`) // vuln-code-snippet vuln-line unionSqlInjectionChallenge dbSchemaChallenge
