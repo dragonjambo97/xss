@@ -12,10 +12,10 @@ import jsSHA from 'jssha'
 import download from 'download'
 import crypto from 'crypto'
 import clarinet from 'clarinet'
-
 import isDocker from './is-docker'
 import isWindows from './is-windows'
 import isHeroku from './is-heroku'
+import sanitizeHtml from 'sanitize-html'
 // import isGitpod from 'is-gitpod') // FIXME Roll back to this when https://github.com/dword-design/is-gitpod/issues/94 is resolve
 const isGitpod = () => false
 
@@ -217,21 +217,8 @@ export const matchesEtcPasswdFile = (text: string) => {
   return match !== null && match.length >= 1
 }
 
-export const clean = sanitizeHtml(dirty, {
-  allowedTags: ['p'],
-  allowedAttributes: {
-    'p': ["style"],
-  },
-  allowedStyles: {
-    '*': {
-      // Match HEX and RGB
-      'color': [/^#(0x)?[0-9a-f]+$/i, /^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/],
-      'text-align': [/^left$/, /^right$/, /^center$/],
-      // Match any number with px, em, or %
-      'font-size': [/^\d+(?:px|em|%)$/]
-    },
-    'p': {
-      'font-size': [/^\d+rem$/]
-    }
-  }
-});
+export const sanitizeInput = (input:string) => {
+  return sanitizeHtml(input, {
+    // tutaj można dodać opcje konfiguracyjne
+  })
+}
