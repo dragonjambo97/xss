@@ -218,7 +218,12 @@ export const matchesEtcPasswdFile = (text: string) => {
 }
 
 export const sanitizeInput = (input:string) => {
-  return sanitizeHtml(input, {
-    // tutaj można dodać opcje konfiguracyjne
-  })
+  return sanitizeHtml(input, {  
+    allowedTags: ['b', 'i', 'em', 'strong', 'a', 'ul', 'li', 'p'],
+  allowedAttributes: {
+    'a': ['href']
+  }
+  }
+    // tutaj można dodać inne opcje konfiguracyjne
+  )
 }
