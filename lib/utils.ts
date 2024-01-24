@@ -218,8 +218,14 @@ export const matchesEtcPasswdFile = (text: string) => {
 }
 
 export const sanitizeInput = (input:string) => {
-  return sanitizeHtml(input, {  
-  }
-    // tutaj można dodać inne opcje konfiguracyjne
-  )
+  const map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#x27;',
+    "/": '&#x2F;',
+  };
+  const reg = /[&<>"'/]/ig;
+  return input.replace(reg, (match)=>(map[match]))
 }
