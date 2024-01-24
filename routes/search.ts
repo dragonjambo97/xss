@@ -7,10 +7,11 @@ import models = require('../models/index')
 import { type Request, type Response, type NextFunction } from 'express'
 import { UserModel } from '../models/user'
 import * as sanitizeHtml from 'sanitize-html'
-
-
+import { sanitizeInput } from './utils'
 import * as utils from '../lib/utils'
 import { stringAt } from 'pdfkit/js/data'
+import * as sanitizeHtml from 'sanitize-html'
+import { sanitizeInput } from './utils'
 const challengeUtils = require('../lib/challengeUtils')
 const challenges = require('../data/datacache').challenges
 
@@ -22,6 +23,10 @@ class ErrorWithParent extends Error {
 module.exports = function searchProducts () {
 
   const sanitizeHtml = require('sanitize-html')
+  export function searchQuery(query: string) {
+    const sanitizedQuery = sanitizeInput(query);
+    // Logika wyszukiwania z użyciem sanitizedQuery
+  }
 
   return (req: Request, res: Response, next: NextFunction) => {
     let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
