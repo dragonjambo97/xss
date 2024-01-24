@@ -19,6 +19,8 @@ class ErrorWithParent extends Error {
 
 // vuln-code-snippet start unionSqlInjectionChallenge dbSchemaChallenge
 module.exports = function searchProducts () {
+  
+  const sanitizeHtml = require('sanitize-html')
 
   return (req: Request, res: Response, next: NextFunction) => {
     let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
