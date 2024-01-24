@@ -216,3 +216,22 @@ export const matchesEtcPasswdFile = (text: string) => {
   const match = text.match(/(\w*:\w*:\d*:\d*:\w*:.*)|(Note that this file is consulted directly)/gi)
   return match !== null && match.length >= 1
 }
+
+export const clean = sanitizeHtml(dirty, {
+  allowedTags: ['p'],
+  allowedAttributes: {
+    'p': ["style"],
+  },
+  allowedStyles: {
+    '*': {
+      // Match HEX and RGB
+      'color': [/^#(0x)?[0-9a-f]+$/i, /^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/],
+      'text-align': [/^left$/, /^right$/, /^center$/],
+      // Match any number with px, em, or %
+      'font-size': [/^\d+(?:px|em|%)$/]
+    },
+    'p': {
+      'font-size': [/^\d+rem$/]
+    }
+  }
+});
