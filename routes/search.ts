@@ -19,21 +19,17 @@ class ErrorWithParent extends Error {
 
 // vuln-code-snippet start unionSqlInjectionChallenge dbSchemaChallenge
 module.exports = function searchProducts () {
-
-  const sanitizeHtml = require('sanitize-html')
-
   return (req: Request, res: Response, next: NextFunction) => {
-    let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
-    criteria = (criteria.length <= 200) ? criteria : criteria.substring(0, 200)
-    
-    // Dodanie sanityzacji dla kryteriów wyszukiwania
-    criteria = sanitizeHtml(criteria, {
-      allowedTags: [] // żadne tagi HTML nie są dozwolone
-      allowedAttributes: {} // żadne atrybuty nie są dozwolone
-      disallowedTagsMode: 'discard'
-    })
 
-    models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`) // vuln-code-snippet vuln-line unionSqlInjectionChallenge dbSchemaChallenge
+    // Dodanie sanityzacji dla kryteriów wyszukiwania
+    let criteria = req.query.q ?? ''
+    criteria = criteria.substring(0, Math.min(criteria.length, 200)) // ogranicz długość
+    criteria = sanitizeInput(criteria) // użycie ulepszonej funkcji sanityzacji
+    
+    models.sequelize.query("SELECT * FROM Products WHERE (name LIKE :criteria OR description LIKE :criteria) AND deletedAt IS NULL ORDER BY name", {
+      replacements: { criteria: `%${criteria}%` }
+      type: models.sequelize.QueryTypes.SELECT
+    })
       .then(([products]: any) => {
         const dataString = JSON.stringify(products)
         if (challengeUtils.notSolved(challenges.unionSqlInjectionChallenge)) { // vuln-code-snippet hide-start
@@ -75,12 +71,12 @@ module.exports = function searchProducts () {
           })
         } // vuln-code-snippet hide-end
         for (let i = 0; i < products.length; i++) {
-          products[i].name = sanitizeHtml(req.__(products[i].name))
-          products[i].description = sanitizeHtml(req.__(products[i].description))
+          products[i].name = utils.sanitizeInput(req.__(products[i].name))
+          products[i].description = utils.sanitizeInput(req.__(products[i].description))
         }
         res.json(utils.queryResultToJson(products))
       }).catch((error: ErrorWithParent) => {
-        next(error.parent)
+        next(error.parent ? error.parent : error)
       })
   }
 }
