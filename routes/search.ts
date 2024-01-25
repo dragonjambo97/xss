@@ -26,7 +26,10 @@ module.exports = function searchProducts () {
     criteria = criteria.substring(0, Math.min(criteria.length, 25)) // ogranicz długość
     criteria = sanitizeInput(criteria) // użycie ulepszonej funkcji sanityzacji
     
-    models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`) // vuln-code-snippet vuln-line unionSqlInjectionChallenge dbSchemaChallenge
+    models.sequelize.query("SELECT * FROM Products WHERE (name LIKE :criteria OR description LIKE :criteria) AND deletedAt IS NULL ORDER BY name", {
+      replacements: { criteria: `%${criteria}%` }
+      type: models.sequelize.QueryTypes.SELECT
+    })
       .then(([products]: any) => {
         const dataString = JSON.stringify(products)
         if (challengeUtils.notSolved(challenges.unionSqlInjectionChallenge)) { // vuln-code-snippet hide-start
@@ -67,12 +70,13 @@ module.exports = function searchProducts () {
             }
           })
         } // vuln-code-snippet hide-end
-        for (let i = 0; i < products.length; i++) {
+        products.forEach(product => {
           products[i].name = utils.sanitizeInput(req.__(products[i].name))
           products[i].description = utils.sanitizeInput(req.__(products[i].description))
-        }
+        })
         res.json(utils.queryResultToJson(products))
-      }).catch((error: ErrorWithParent) => {
+      })
+      .catch((error: ErrorWithParent) => {
         next(error.parent ? error.parent : error)
       })
   }
