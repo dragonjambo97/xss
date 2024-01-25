@@ -9,7 +9,7 @@ import { UserModel } from '../models/user'
 import * as utils from '../lib/utils'
 import { stringAt } from 'pdfkit/js/data'
 import * as sanitizeHtml from 'sanitize-html'
-import { sanitizeInput } from './utils'
+import { sanitizeInput } from '../lib/utils'
 const challengeUtils = require('../lib/challengeUtils')
 const challenges = require('../data/datacache').challenges
 
