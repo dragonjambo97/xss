@@ -16,6 +16,7 @@ import isDocker from './is-docker'
 import isWindows from './is-windows'
 import isHeroku from './is-heroku'
 import sanitizeHtml from 'sanitize-html'
+
 // import isGitpod from 'is-gitpod') // FIXME Roll back to this when https://github.com/dword-design/is-gitpod/issues/94 is resolve
 const isGitpod = () => false
 
@@ -219,12 +220,15 @@ export const matchesEtcPasswdFile = (text: string) => {
 
 export const sanitizeInput = (input:string) => {
   const map = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#x27;',
-    "/": '&#x2F;',
+    '&': '&amp;'
+    '<': '&lt;'
+    '>': '&gt;'
+    '"': '&quot;'
+    "'": '&#x27;'
+    "/": '&#x2F;'
+    "img": '&#ix2mg'
+    "(": 'leftc'
+    ")": 'rightc'
   };
   const reg = /[&<>"'/]/ig;
   return input.replace(reg, (match)=>(map[match]))
