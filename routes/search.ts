@@ -19,7 +19,7 @@ class ErrorWithParent extends Error {
 
 // vuln-code-snippet start unionSqlInjectionChallenge dbSchemaChallenge
 module.exports = function searchProducts () {
-  
+
   const sanitizeHtml = require('sanitize-html')
 
   return (req: Request, res: Response, next: NextFunction) => {
@@ -75,8 +75,8 @@ module.exports = function searchProducts () {
           })
         } // vuln-code-snippet hide-end
         for (let i = 0; i < products.length; i++) {
-          products[i].name = req.__(products[i].name)
-          products[i].description = req.__(products[i].description)
+          products[i].name = sanitizeHtml(req.__(products[i].name))
+          products[i].description = sanitizeHtml(req.__(products[i].description))
         }
         res.json(utils.queryResultToJson(products))
       }).catch((error: ErrorWithParent) => {
