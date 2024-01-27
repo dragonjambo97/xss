@@ -8,7 +8,6 @@ import { type Request, type Response, type NextFunction } from 'express'
 import { UserModel } from '../models/user'
 import * as utils from '../lib/utils'
 import { stringAt } from 'pdfkit/js/data'
-import * as sanitizeHtml from 'sanitize-html'
 import { sanitizeInput } from '../lib/utils'
 
 const challengeUtils = require('../lib/challengeUtils')
@@ -20,11 +19,15 @@ class ErrorWithParent extends Error {
 
 // vuln-code-snippet start unionSqlInjectionChallenge dbSchemaChallenge
 module.exports = function searchProducts () {
+  
   return (req: Request, res: Response, next: NextFunction) => {
 
   
     let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
-    criteria = (criteria.length <= 50) ? criteria : criteria.substring(0, 50)
+    // W miejscu odbierania danych wejściowych
+    const sanitizedInput = utils.sanitizeInput(criteria);
+
+    criteria = criteria = sanitizeInput(criteria);
     models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`) // vuln-code-snippet vuln-line unionSqlInjectionChallenge dbSchemaChallenge
 
       .then(([products]: any) => {
@@ -66,7 +69,8 @@ module.exports = function searchProducts () {
               }
             }
           })
-        } // vuln-code-snippet hide-end
+        }
+        // vuln-code-snippet hide-end
         products.forEach((product: any) => {
           product.name = utils.sanitizeInput(req.__('name', { name: product.name })),
           product.description = utils.sanitizeInput(req.__('description', { description: product.description }))
