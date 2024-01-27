@@ -27,6 +27,7 @@ import morgan from 'morgan'
 import colors from 'colors/safe'
 import * as utils from './lib/utils'
 
+
 const startTime = Date.now()
 const finale = require('finale-rest')
 const express = require('express')
@@ -125,6 +126,12 @@ const startupGauge = new client.Gauge({
   name: `${appName}_startup_duration_seconds`,
   help: `Duration ${appName} required to perform a certain task during startup`,
   labelNames: ['task']
+})
+//CSP POLICY
+const app = express()
+app.use((req, res, next) => {
+    res.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;")
+    next()
 })
 
 // Wraps the function and measures its (async) execution time
@@ -721,3 +728,5 @@ export function close (exitCode: number | undefined) {
 // stop server on sigint or sigterm signals
 process.on('SIGINT', () => { close(0) })
 process.on('SIGTERM', () => { close(0) })
+
+export default app;
