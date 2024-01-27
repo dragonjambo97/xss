@@ -218,18 +218,10 @@ export const matchesEtcPasswdFile = (text: string) => {
   return match !== null && match.length >= 1
 }
 
-export const sanitizeInput = (input:string) => {
-  const map = {
-    '&': '&amp;'
-    '<': '&lt;'
-    '>': '&gt;'
-    '"': '&quot;'
-    "'": '&#x27;'
-    "/": '&#x2F;'
-    "img": '&#ix2mg'
-    "(": 'leftc'
-    ")": 'rightc'
-  };
-  const reg = /[&<>"'/]/ig;
-  return input.replace(reg, (match)=>(map[match]))
+export const sanitizeInput = (input: string): string => {
+  return sanitizeHtml(input, {
+    allowedTags: [], // nie pozwól na żadne tagi HTML
+    allowedAttributes: {} ,// nie pozwól na żadne atrybuty
+    disallowedTagsMode: 'discard'// wszystko usuwane z HTML
+  })
 }
