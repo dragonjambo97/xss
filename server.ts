@@ -128,8 +128,8 @@ const startupGauge = new client.Gauge({
   labelNames: ['task']
 })
 //CSP POLICY
-const app = express()
-app.use((req, res, next) => {
+
+app.use((req: Request, res: Response, next: NextFunction) => {
     res.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;")
     next()
 })
