@@ -67,16 +67,15 @@ module.exports = function searchProducts () {
             }
           })
         } // vuln-code-snippet hide-end
-        products.forEach(products(i) => {
-          
-          products[i].name = utils.sanitizeInput(req.__(products[i].name)),
-          products[i].description = utils.sanitizeInput(req.__(products[i].description))
-        })
+        products.forEach((product: any) => {
+          product.name = utils.sanitizeInput(req.__('name', { name: product.name })),
+          product.description = utils.sanitizeInput(req.__('description', { description: product.description }))
+      })
         res.json(utils.queryResultToJson(products))
       })
       .catch((error: ErrorWithParent) => {
         next(error.parent ? error.parent : error)
-      })
+      }) 
   }
 }
 // vuln-code-snippet end unionSqlInjectionChallenge dbSchemaChallenge
