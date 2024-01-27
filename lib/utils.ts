@@ -222,6 +222,10 @@ export const sanitizeInput = (input: string): string => {
   return sanitizeHtml(input, {
     allowedTags: [], // nie pozwól na żadne tagi HTML
     allowedAttributes: {} ,// nie pozwól na żadne atrybuty
-    disallowedTagsMode: 'discard'// wszystko usuwane z HTML
+    disallowedTagsMode: 'discard',// wszystko usuwane z HTML
+    //dodatkowe zabezpieczenia
+    exclusiveFilter: (frame) => frame.tag === 'script', // Odrzuć wszystkie tagi <script>
+    textFilter: (text) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'), // Zamieniaj znaki specjalne na encje HTML
+    nonTextTags: ['style', 'script', 'textarea', 'noscript'], // Ignoruj treść w tych tagach
   })
 }

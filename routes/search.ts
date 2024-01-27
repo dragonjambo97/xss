@@ -25,7 +25,7 @@ module.exports = function searchProducts () {
   
     let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
     // W miejscu odbierania danych wejściowych
-    const sanitizedInput = utils.sanitizeInput(criteria);
+    const sanitizedInput = sanitizeInput(criteria);
 
     criteria = criteria = sanitizeInput(criteria);
     models.sequelize.query(`SELECT * FROM Products WHERE ((name LIKE '%${criteria}%' OR description LIKE '%${criteria}%') AND deletedAt IS NULL) ORDER BY name`) // vuln-code-snippet vuln-line unionSqlInjectionChallenge dbSchemaChallenge
