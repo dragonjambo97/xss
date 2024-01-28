@@ -130,9 +130,9 @@ const startupGauge = new client.Gauge({
 //CSP POLICY
 
 app.use((req: Request, res: Response, next: NextFunction) => {
-  res.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;")
-  next()
-})
+  res.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://trusted-script-source.com; object-src 'none'; style-src 'self' 'unsafe-inline' https://trusted-style-source.com; img-src 'self' data: https://trusted-image-source.com;");
+  next();
+});
 
 // Wraps the function and measures its (async) execution time
 const collectDurationPromise = (name: string, func: any) => {
