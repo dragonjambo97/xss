@@ -130,7 +130,7 @@ const startupGauge = new client.Gauge({
 //CSP POLICY
 
 app.use((req: Request, res: Response, next: NextFunction) => {
-  res.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self' https://trusted-source.com; object-src 'none'");
+  res.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self'; object-src 'none'");
   next();
 });
 
