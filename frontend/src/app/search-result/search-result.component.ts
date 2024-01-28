@@ -66,7 +66,7 @@ export class SearchResultComponent implements OnDestroy, AfterViewInit {
     forkJoin([quantities, productsObservable]).subscribe(([quantities, products]) => {
       const dataTable: TableEntry[] = [];
       console.log('Typ products:', typeof products);
-      console.log('Zawartość products:', products);
+      console.log('Zawartość products:', products);// vuln-code-snippet neutral-line restfulXssChallenge
       if (Array.isArray(products)) {
       for (const product of products) {
         dataTable.push({
@@ -119,12 +119,12 @@ export class SearchResultComponent implements OnDestroy, AfterViewInit {
         }
       } else {
         this.breakpoint = 6
-      }
-      this.cdRef.detectChanges()
-    } 
-    (err) => { console.log(err) }};
-  })}
-
+      }// vuln-code-snippet neutral-line restfulXssChallenge
+      this.cdRef.detectChanges()// vuln-code-snippet neutral-line restfulXssChallenge
+    } // vuln-code-snippet vuln-line restfulXssChallenge
+    (err) => { console.log(err) }};// vuln-code-snippet neutral-line restfulXssChallenge
+  })}// vuln-code-snippet neutral-line restfulXssChallenge
+// vuln-code-snippet end restfulXssChallenge
 
   ngOnDestroy () {
     if (this.routerSubscription) {
