@@ -20,6 +20,7 @@ import { BasketItemModel } from './models/basketitem'
 import { FeedbackModel } from './models/feedback'
 import { ProductModel } from './models/product'
 import { WalletModel } from './models/wallet'
+import { sanitizeInput } from './lib/utils';
 import logger from './lib/logger'
 import config from 'config'
 import path from 'path'
@@ -561,6 +562,10 @@ restoreOverwrittenFilesWithOriginals().then(() => {
   app.get('/rest/user/whoami', security.updateAuthenticatedUsers(), currentUser())
   app.get('/rest/user/authentication-details', authenticatedUsers())
   app.get('/rest/products/search', search())
+  app.post('/rest/products/search',(req: Request, res: Response) => {
+    // Oczyszczanie danych wejściowych wyszukiwania przed ich przetwarzaniem
+    const searchTerm = sanitizeInput(req.body.searchTerm)})
+    
   app.get('/rest/basket/:id', basket())
   app.post('/rest/basket/:id/checkout', order())
   app.put('/rest/basket/:id/coupon/:coupon', coupon())
