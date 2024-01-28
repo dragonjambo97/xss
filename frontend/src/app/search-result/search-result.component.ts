@@ -60,13 +60,14 @@ export class SearchResultComponent implements OnDestroy, AfterViewInit {
     private readonly snackBarHelperService: SnackBarHelperService, private readonly cdRef: ChangeDetectorRef) { }
 
   // vuln-code-snippet start restfulXssChallenge
-  ngAfterViewInit () {
-    const products = this.productService.search('')
-    const quantities = this.quantityService.getAll()
-    forkJoin([quantities, products]).subscribe(([quantities, products]) => {
-      const dataTable: TableEntry[] = []
-      this.tableData = products
-      this.trustProductDescription(products) // vuln-code-snippet neutral-line restfulXssChallenge
+  ngAfterViewInit() {
+    const quantities = this.quantityService.getAll();
+    const productsObservable = this.productService.search('');
+    forkJoin([quantities, productsObservable]).subscribe(([quantities, products]) => {
+      const dataTable: TableEntry[] = [];
+      console.log('Typ products:', typeof products);
+      console.log('Zawartość products:', products);
+      if (Array.isArray(products)) {
       for (const product of products) {
         dataTable.push({
           name: product.name,
@@ -74,9 +75,12 @@ export class SearchResultComponent implements OnDestroy, AfterViewInit {
           deluxePrice: product.deluxePrice,
           id: product.id,
           image: product.image,
-          description: product.description
-        })
+          description: product.description // Upewnij się, że to jest bezpieczne
+        });
       }
+      console.log('Typ quantities:', typeof quantities);
+      console.log('Zawartość quantities:', quantities);
+      if (Array.isArray(quantities)) {
       for (const quantity of quantities) {
         const entry = dataTable.find((dataTableEntry) => {
           return dataTableEntry.id === quantity.ProductId
@@ -117,8 +121,9 @@ export class SearchResultComponent implements OnDestroy, AfterViewInit {
         this.breakpoint = 6
       }
       this.cdRef.detectChanges()
-    }, (err) => { console.log(err) })
-  }
+    } 
+    (err) => { console.log(err) }};
+  })}
 
 
   ngOnDestroy () {
@@ -134,26 +139,19 @@ export class SearchResultComponent implements OnDestroy, AfterViewInit {
   }
 
   // vuln-code-snippet start localXssChallenge xssBonusChallenge
-  filterTable () {
-    let queryParam: string = this.route.snapshot.queryParams.q
+  filterTable() {
+    let queryParam: string = this.route.snapshot.queryParams.q;
     if (queryParam) {
-      queryParam = queryParam.trim()
-      this.ngZone.runOutsideAngular(() => { // vuln-code-snippet hide-start
-        this.io.socket().emit('verifyLocalXssChallenge', queryParam)
-      }) // vuln-code-snippet hide-end
-      this.dataSource.filter = queryParam.toLowerCase()
-      this.searchValue = queryParam // vuln-code-snippet vuln-line localXssChallenge xssBonusChallenge
+      queryParam = queryParam.trim();
+      this.dataSource.filter = queryParam.toLowerCase();
+      this.searchValue = queryParam; // Bezpieczne przypisanie
       this.gridDataSource.subscribe((result: any) => {
-        if (result.length === 0) {
-          this.emptyState = true
-        } else {
-          this.emptyState = false
-        }
-      })
+        this.emptyState = result.length === 0;
+      });
     } else {
-      this.dataSource.filter = ''
-      this.searchValue = undefined
-      this.emptyState = false
+      this.dataSource.filter = '';
+      this.searchValue = undefined;
+      this.emptyState = false;
     }
   }
   // vuln-code-snippet end localXssChallenge xssBonusChallenge
