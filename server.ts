@@ -129,8 +129,8 @@ const startupGauge = new client.Gauge({
 })
 //CSP POLICY
 
-app.use((req: Request, res: Response, next: NextFunction) => {
-  res.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self'; object-src 'self'");
+app.use((req, res, next) => {
+  res.setHeader("Content-Security-Policy", "default-src 'self'; img-src 'self' https://trusted-image-source.com;");
   next();
 });
 
