@@ -131,7 +131,7 @@ const startupGauge = new client.Gauge({
 //CSP POLICY
 
 app.use((req: Request, res: Response, next: NextFunction) => {
-  res.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://trusted-script-source.com; object-src 'none'; style-src 'self' 'unsafe-inline' https://trusted-style-source.com; img-src 'self' data: https://trusted-image-source.com; frame-src 'self' https://trusted-source.com;");
+  res.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://trusted-script-source.com; object-src 'none'; style-src 'self' 'unsafe-inline' https://trusted-style-source.com; img-src 'self' data: https://trusted-image-source.com;");
   next();
 });
 
