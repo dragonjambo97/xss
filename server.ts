@@ -131,7 +131,7 @@ const startupGauge = new client.Gauge({
 //CSP POLICY
 
 app.use((req: Request, res: Response, next: NextFunction) => {
-  res.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://trusted-script-source.com; object-src 'none'; style-src 'self' 'unsafe-inline' https://trusted-style-source.com; img-src 'self' data: https://trusted-image-source.com;");
+  res.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://trusted-script-source.com; object-src 'none'; style-src 'self' 'unsafe-inline' https://trusted-style-source.com; img-src 'self' data: https://trusted-image-source.com; frame-src 'none;");
   next();
 });
 
@@ -561,7 +561,11 @@ restoreOverwrittenFilesWithOriginals().then(() => {
   app.get('/rest/user/security-question', securityQuestion())
   app.get('/rest/user/whoami', security.updateAuthenticatedUsers(), currentUser())
   app.get('/rest/user/authentication-details', authenticatedUsers())
-  app.get('/rest/products/search', search())
+
+  app.get('/rest/products/search',(req: Request, res: Response) => {
+    // Oczyszczanie danych adresu url
+    const searchTerm = sanitizeInput(req.body.searchTerm)})
+
   app.post('/rest/products/search',(req: Request, res: Response) => {
     // Oczyszczanie danych wejściowych wyszukiwania przed ich przetwarzaniem
     const searchTerm = sanitizeInput(req.body.searchTerm)})
