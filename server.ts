@@ -648,6 +648,19 @@ restoreOverwrittenFilesWithOriginals().then(() => {
   console.error(err)
 })
 
+const session = require('express-session');
+
+app.use(session({
+  secret: 'your_secret_key', // Zmień na swój sekretny klucz sesji
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    httpOnly: true,
+    secure: true, // Włącz dla HTTPS, dla HTTP w środowisku deweloperskim może być wyłączone
+    sameSite: 'strict' // Opcjonalnie, dla dodatkowego zabezpieczenia
+  }
+}));
+
 const multer = require('multer')
 const uploadToMemory = multer({ storage: multer.memoryStorage(), limits: { fileSize: 200000 } })
 const mimeTypeMap: any = {
