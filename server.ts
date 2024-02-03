@@ -27,11 +27,13 @@ import path from 'path'
 import morgan from 'morgan'
 import colors from 'colors/safe'
 import * as utils from './lib/utils'
-import { models } from './models'
+import { Sequelize } from 'sequelize';
 
 const startTime = Date.now()
 const finale = require('finale-rest')
 const express = require('express')
+const router = express.Router()
+
 const compression = require('compression')
 const helmet = require('helmet')
 const featurePolicy = require('feature-policy')
@@ -562,19 +564,23 @@ restoreOverwrittenFilesWithOriginals().then(() => {
   app.get('/rest/user/whoami', security.updateAuthenticatedUsers(), currentUser())
   app.get('/rest/user/authentication-details', authenticatedUsers())
 
-  app.get('/rest/products/search', async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const searchTerm = req.query.q ? sanitizeInput(req.query.q as string) : '';
-        // Zakładając, że masz funkcję w models/Product, która wykonuje bezpieczne wyszukiwanie
-        // Na przykład, funkcja searchProducts może być metodą, która bezpiecznie obsługuje wyszukiwanie w bazie danych
-        // Uwzględniając sanitizedInput zamiast bezpośrednio używać niezaufanego wejścia od użytkownika
-        const products = await models.Product.searchProducts(searchTerm);
-        res.json(products);
-    } catch (error) {
-        next(error);
-    }
+ 
+app.get('/search', async (req: Request, res: Response) => {
+  try {
+    const searchTerm: string = req.query.q ? sanitizeInput(req.query.q.toString()) : '';
+    const products = await ProductModel.findAll({
+      where: {
+        name: {
+          [Sequelize.Op.like]: `%${searchTerm}%`
+        }
+      }
+    });
+    res.json(products);
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ message: 'Wystąpił błąd podczas wyszukiwania produktów', error: err.message });
+}
 });
-
 
   app.post('/rest/products/search',(req: Request, res: Response) => {
     // Oczyszczanie danych wejściowych wyszukiwania przed ich przetwarzaniem
