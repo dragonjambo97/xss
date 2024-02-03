@@ -562,7 +562,10 @@ restoreOverwrittenFilesWithOriginals().then(() => {
   app.get('/rest/user/whoami', security.updateAuthenticatedUsers(), currentUser())
   app.get('/rest/user/authentication-details', authenticatedUsers())
 
-  app.get('/rest/products/search', search())
+  app.get('/rest/products/search', (req: Request, res: Response) => {
+    const searchTerm = req.query.q ? sanitizeInput(req.query.q as any) : '';
+    // Logika przetwarzania wyszukiwania z użyciem searchTerm
+})
 
   app.post('/rest/products/search',(req: Request, res: Response) => {
     // Oczyszczanie danych wejściowych wyszukiwania przed ich przetwarzaniem
