@@ -27,13 +27,11 @@ import path from 'path'
 import morgan from 'morgan'
 import colors from 'colors/safe'
 import * as utils from './lib/utils'
-import { Sequelize } from 'sequelize';
+
 
 const startTime = Date.now()
 const finale = require('finale-rest')
 const express = require('express')
-const router = express.Router()
-
 const compression = require('compression')
 const helmet = require('helmet')
 const featurePolicy = require('feature-policy')
@@ -133,7 +131,7 @@ const startupGauge = new client.Gauge({
 //CSP POLICY
 
 app.use((req: Request, res: Response, next: NextFunction) => {
-  res.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://trusted-script-source.com; object-src 'none'; style-src 'self' 'unsafe-inline' https://trusted-style-source.com; img-src 'self' data: https://trusted-image-source.com; frame-src 'self' https://trusted-source.com;");
+  res.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://trusted-script-source.com; object-src 'none'; style-src 'self' 'unsafe-inline' https://trusted-style-source.com; img-src 'self' data: https://trusted-image-source.com;");
   next();
 });
 
@@ -563,25 +561,7 @@ restoreOverwrittenFilesWithOriginals().then(() => {
   app.get('/rest/user/security-question', securityQuestion())
   app.get('/rest/user/whoami', security.updateAuthenticatedUsers(), currentUser())
   app.get('/rest/user/authentication-details', authenticatedUsers())
-
- 
-app.get('/search', async (req: Request, res: Response) => {
-  try {
-    const searchTerm: string = req.query.q ? sanitizeInput(req.query.q.toString()) : '';
-    const products = await ProductModel.findAll({
-      where: {
-        name: {
-          [Sequelize.Op.like]: `%${searchTerm}%`
-        }
-      }
-    });
-    res.json(products);
-  } catch (err: any) {
-    console.error(err);
-    res.status(500).json({ message: 'Wystąpił błąd podczas wyszukiwania produktów', error: err.message });
-}
-});
-
+  app.get('/rest/products/search', search())
   app.post('/rest/products/search',(req: Request, res: Response) => {
     // Oczyszczanie danych wejściowych wyszukiwania przed ich przetwarzaniem
     const searchTerm = sanitizeInput(req.body.searchTerm)})
