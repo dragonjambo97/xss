@@ -27,7 +27,7 @@ import path from 'path'
 import morgan from 'morgan'
 import colors from 'colors/safe'
 import * as utils from './lib/utils'
-
+import { models } from './models'
 
 const startTime = Date.now()
 const finale = require('finale-rest')
@@ -562,10 +562,19 @@ restoreOverwrittenFilesWithOriginals().then(() => {
   app.get('/rest/user/whoami', security.updateAuthenticatedUsers(), currentUser())
   app.get('/rest/user/authentication-details', authenticatedUsers())
 
-  app.get('/rest/products/search', (req: Request, res: Response) => {
-    const searchTerm = req.query.q ? sanitizeInput(req.query.q as any) : '';
-    // Logika przetwarzania wyszukiwania z użyciem searchTerm
-})
+  app.get('/rest/products/search', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const searchTerm = req.query.q ? sanitizeInput(req.query.q as string) : '';
+        // Zakładając, że masz funkcję w models/Product, która wykonuje bezpieczne wyszukiwanie
+        // Na przykład, funkcja searchProducts może być metodą, która bezpiecznie obsługuje wyszukiwanie w bazie danych
+        // Uwzględniając sanitizedInput zamiast bezpośrednio używać niezaufanego wejścia od użytkownika
+        const products = await models.Product.searchProducts(searchTerm);
+        res.json(products);
+    } catch (error) {
+        next(error);
+    }
+});
+
 
   app.post('/rest/products/search',(req: Request, res: Response) => {
     // Oczyszczanie danych wejściowych wyszukiwania przed ich przetwarzaniem
